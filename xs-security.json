@@ -1,0 +1,73 @@
+{
+  "xsappname": "dependency_probab_rule",
+  "tenant-mode": "dedicated",
+  "description": "Security profile of called application",
+ "scopes": [
+    {
+      "name": "$XSAPPNAME.Admin",
+      "description": "Full administrative access"
+    },
+    {
+      "name": "$XSAPPNAME.Planner",
+      "description": "Planning and configuration access"
+    },
+    {
+      "name": "$XSAPPNAME.Viewer",
+      "description": "Read-only access"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "Admin",
+      "description": "Administrator Role",
+      "scope-references": [
+        "$XSAPPNAME.Admin",
+        "$XSAPPNAME.Planner",
+        "$XSAPPNAME.Viewer"
+      ]
+    },
+    {
+      "name": "Planner",
+      "description": "Planner Role",
+      "scope-references": [
+        "$XSAPPNAME.Planner",
+        "$XSAPPNAME.Viewer"
+      ]
+    },
+    {
+      "name": "Viewer",
+      "description": "Viewer Role",
+      "scope-references": [
+        "$XSAPPNAME.Viewer"
+      ]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "VC Planner Admin",
+      "description": "VC Planner Administrators",
+      "role-template-references": [
+        "$XSAPPNAME.Admin"
+      ]
+    },
+    {
+      "name": "VC Planner User",
+      "description": "VC Planner Users",
+      "role-template-references": [
+        "$XSAPPNAME.Planner"
+      ]
+    },
+    {
+      "name": "VC Planner Viewer",
+      "description": "VC Planner Viewers",
+      "role-template-references": [
+        "$XSAPPNAME.Viewer"
+      ]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.cfapps.eu10.hana.ondemand.com/**"
+    ]
+  }
+}

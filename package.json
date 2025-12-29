@@ -1,0 +1,57 @@
+{
+  "name": "Dependency_Probab_Rule",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "dependencies": {
+    "@cap-js/hana": "^2",
+    "@cap-js/notifications": "*",
+    "@sap/cds": "^9",
+    "@sap/xssec": "^4",
+    "express": "^4",
+    "express-fileupload": "^1.5.2",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@sap/cds-dk": "^9",
+    "concurrently": "^8.2.0",
+    "cors": "^2.8.5",
+    "helmet": "^6.0.0",
+     "xlsx": "^0.18.5",
+      "morgan": "^1.10.0",
+    "express-fileupload": "^1.4.3"
+  },
+  "scripts": {
+    "start": "npm run start:srv",
+    "start:srv": "cd srv && npm start",
+    "build": "npm run build:app && npm run build:srv",
+    "build:app": "cd app && npm run build",
+    "build:srv": "cd srv && npm run build",
+    "install:all": "npm install && cd srv && npm install && cd ../app && npm install",
+    "dev": "concurrently \"npm run dev:srv\" \"npm run dev:app\"",
+    "dev:srv": "cd srv && npm run dev",
+    "dev:app": "cd app && npm start",
+    "deploy": "cf push",
+    "test": "npm run test:srv && npm run test:app",
+    "test:srv": "cd srv && npm test",
+    "test:app": "cd app && npm test"
+  },
+  "private": true,
+  "cds": {
+    "requires": {
+      "[production]": {
+        "auth": "xsuaa"
+      },
+      "messaging": {
+        "kind": "enterprise-messaging"
+      },
+      "connectivity": true,
+      "destinations": true,
+      "html5-repo": true,
+      "application-logging": true
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
