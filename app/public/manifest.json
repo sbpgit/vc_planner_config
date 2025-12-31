@@ -1,0 +1,19 @@
+{
+  "_version": "1.12.0",
+  "sap.app": {
+    "id": "dependency.probab.rule",
+    "type": "application",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "title": "Dependency Probability Rule",
+    "description": "VC Planner Configuration UI"
+  },
+  "sap.ui": {
+    "technology": "UI5"
+  },
+   "sap.cloud": {
+            "public": true,
+            "service": "dependencyprobabrule"
+      }
+}

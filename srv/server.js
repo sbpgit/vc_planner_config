@@ -10,11 +10,10 @@ const morgan = require('morgan');
 const fileUpload = require('express-fileupload');
 const { v4: uuidv4 } = require('uuid');
 const XLSX = require('xlsx');
-
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 4000;
-
+const cds = require('@sap/cds');
 // Middleware
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
@@ -25,7 +24,6 @@ app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
   abortOnLimit: true
 }));
-
 // In-memory data store (replace with HANA DB in production)
 let dataStore = {
   products: [],
@@ -37,6 +35,8 @@ let dataStore = {
   probabilityScenarios: [],
   versions: []
 };
+cds.on('bootstrap', app => {
+
 
 // Initialize with sample data
 initializeSampleData();
@@ -489,6 +489,7 @@ app.post('/api/versions/:id/restore', (req, res) => {
   
   res.json({ success: true, message: `Restored to version: ${version.name}` });
 });
+})
 
 // ============================================
 // HELPER FUNCTIONS
@@ -956,10 +957,10 @@ function initializeSampleData() {
 }
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`VC Planner Configuration Server running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log(`API Base URL: http://localhost:${PORT}/api`);
-});
-
-module.exports = app;
+// app.listen(PORT, () => {
+//   console.log(`VC Planner Configuration Server running on port ${PORT}`);
+//   console.log(`Health check: http://localhost:${PORT}/health`);
+//   console.log(`API Base URL: http://localhost:${PORT}/api`);
+// });
+module.exports = cds.server
+// module.exports = app;

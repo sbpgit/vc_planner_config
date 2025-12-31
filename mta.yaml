@@ -1,152 +1,97 @@
 _schema-version: 3.3.0
 ID: Dependency_Probab_Rule
+description: A simple CAP project.
 version: 1.0.0
-description: "A simple CAP project."
+modules:
+- name: Dependency_Probab_Rule-srv
+  type: nodejs
+  path: gen/srv
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    disk-quota: 512MB
+    instances: 1
+    memory: 512MB
+  build-parameters:
+    builder: npm-ci
+    ignore:
+    - env
+    - ./node_modules
+- name: Dependency_Probab_Rule-app
+  type: com.sap.application.content
+  path: app
+  build-parameters:
+    build-result: build
+  requires:
+    - name: Dependency_Probab_Rule_html_repo_host
+- name: Dependency_Probab_Rule-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: Dependency_Probab_Rule-destination-service
+    parameters:
+      content-target: true
+  - name: Dependency_Probab_Rule_html_repo_host
+    parameters:
+      service-key:
+        name: Dependency_Probab_Rule_html_repo_host-key
+  - name: uaa_Dependency_Probab_Rule
+    parameters:
+      service-key:
+        name: uaa_Dependency_Probab_Rule-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: approutermanaged_Dependency_Probab_Rule_html_repo_host
+          ServiceInstanceName: Dependency_Probab_Rule_html_repo_host
+          ServiceKeyName: Dependency_Probab_Rule_html_repo_host-key
+          sap.cloud.service: approutermanaged
+        - Authentication: OAuth2UserTokenExchange
+          Name: approutermanaged_uaa_Dependency_Probab_Rule
+          ServiceInstanceName: Dependency_Probab_Rule-xsuaa-service
+          ServiceKeyName: uaa_Dependency_Probab_Rule-key
+          sap.cloud.service: approutermanaged
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+resources:
+- name: Dependency_Probab_Rule_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+- name: Dependency_Probab_Rule-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+      version: 1.0.0
+    service: destination
+    service-name: Dependency_Probab_Rule-destination-service
+    service-plan: lite
+- name: uaa_Dependency_Probab_Rule
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: Dependency_Probab_Rule-xsuaa-service
+    service-plan: application
 parameters:
   enable-parallel-deployments: true
-  deploy_mode: html5-repo
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production
-modules:
-  - name: Dependency_Probab_Rule-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      instances: 1
-      buildpack: nodejs_buildpack
-    build-parameters:
-      builder: npm-ci
-      ignore:
-      - env
-      - ./node_modules
-    provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
-        properties:
-          srv-url: ${default-url}
-    requires:
-      - name: Dependency_Probab_Rule-auth
-      - name: Dependency_Probab_Rule-db
-      - name: Dependency_Probab_Rule-messaging
-      - name: Dependency_Probab_Rule-connectivity
-      - name: Dependency_Probab_Rule-destination
-      - name: Dependency_Probab_Rule-logging
-
-  - name: Dependency_Probab_Rule-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: Dependency_Probab_Rule-db
-  - name: Dependency_Probab_Rule
-    type: approuter.nodejs
-    path: app/router
-    parameters:
-      keep-existing-routes: true
-      disk-quota: 256M
-      memory: 256M
-    requires:
-      - name: srv-api
-        group: destinations
-        properties:
-          name: srv-api # must be used in xs-app.json as well
-          url: ~{srv-url}
-          forwardAuthToken: true
-      - name: Dependency_Probab_Rule-auth
-      - name: Dependency_Probab_Rule-destination
-      - name: Dependency_Probab_Rule-html5-runtime
-      - name: Dependency_Probab_Rule-logging
-    provides:
-      - name: app-api
-        properties:
-          app-protocol: ${protocol}
-          app-uri: ${default-uri}
-
-  - name: Dependency_Probab_Rule-app-deployer
-    type: com.sap.application.content
-    path: gen
-    requires:
-      - name: Dependency_Probab_Rule-auth
-      - name: srv-api
-      - name: Dependency_Probab_Rule-html5-repo-host
-        parameters:
-          content-target: true
-          config:
-            HTML5Runtime_enabled: true
-    build-parameters:
-      build-result: app/
-      requires:
-
-  - name: notification-content-deployment
-    type: nodejs
-    path: gen/srv
-    parameters:
-      no-route: true
-      no-start: true
-      memory: 256MB
-      disk-quota: 1GB
-      tasks:
-        - name: notification-content-deployment
-          command: "node node_modules/@cap-js/notifications/lib/content-deployment.js"
-          memory: 256MB
-          disk-quota: 1GB
-    requires:
-      - name: Dependency_Probab_Rule-destination
-resources:
-  - name: Dependency_Probab_Rule-auth
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: Dependency_Probab_Rule-${org}-${space}
-        tenant-mode: dedicated
-        oauth2-configuration:
-          redirect-uris:
-            - https://*~{app-api/app-uri}/**
-    requires:
-      - name: app-api
-    processed-after:
-      - Dependency_Probab_Rule-messaging
-  - name: Dependency_Probab_Rule-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
-  - name: Dependency_Probab_Rule-messaging
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: enterprise-messaging
-      service-plan: default
-      path: ./event-mesh.json
-  - name: Dependency_Probab_Rule-connectivity
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: connectivity
-      service-plan: lite
-  - name: Dependency_Probab_Rule-destination
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: destination
-      service-plan: lite
-
-  - name: Dependency_Probab_Rule-html5-repo-host
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: html5-apps-repo
-      service-plan: app-host
-  - name: Dependency_Probab_Rule-html5-runtime
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: html5-apps-repo
-      service-plan: app-runtime
-  - name: Dependency_Probab_Rule-logging
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: application-logs
-      service-plan: standard
+  - builder: custom
+    commands:
+    - npm ci
+    - npm run build

@@ -4,70 +4,38 @@
   "description": "Security profile of called application",
  "scopes": [
     {
-      "name": "$XSAPPNAME.Admin",
-      "description": "Full administrative access"
+      "name": "uaa.user",
+      "description": "UAA"
     },
     {
-      "name": "$XSAPPNAME.Planner",
-      "description": "Planning and configuration access"
+      "name": "$XSAPPNAME.User",
+      "description": "General user access"
     },
     {
-      "name": "$XSAPPNAME.Viewer",
-      "description": "Read-only access"
+      "name": "$XSAPPNAME.read",
+      "description": "Read authorization"
+    },
+    {
+      "name": "$XSAPPNAME.admin",
+      "description": "Admin authorization"
     }
   ],
   "role-templates": [
     {
-      "name": "Admin",
-      "description": "Administrator Role",
+      "name": "VCPUserRole",
+      "description": "UAA VCPUserRole",
       "scope-references": [
-        "$XSAPPNAME.Admin",
-        "$XSAPPNAME.Planner",
-        "$XSAPPNAME.Viewer"
-      ]
-    },
-    {
-      "name": "Planner",
-      "description": "Planner Role",
-      "scope-references": [
-        "$XSAPPNAME.Planner",
-        "$XSAPPNAME.Viewer"
-      ]
-    },
-    {
-      "name": "Viewer",
-      "description": "Viewer Role",
-      "scope-references": [
-        "$XSAPPNAME.Viewer"
-      ]
-    }
-  ],
-  "role-collections": [
-    {
-      "name": "VC Planner Admin",
-      "description": "VC Planner Administrators",
-      "role-template-references": [
-        "$XSAPPNAME.Admin"
-      ]
-    },
-    {
-      "name": "VC Planner User",
-      "description": "VC Planner Users",
-      "role-template-references": [
-        "$XSAPPNAME.Planner"
-      ]
-    },
-    {
-      "name": "VC Planner Viewer",
-      "description": "VC Planner Viewers",
-      "role-template-references": [
-        "$XSAPPNAME.Viewer"
+        "$XSAPPNAME.User"
       ]
     }
   ],
   "oauth2-configuration": {
+    "token-validity": 3600,
     "redirect-uris": [
-      "https://*.cfapps.eu10.hana.ondemand.com/**"
+      "https://*.hana.ondemand.com/**",
+      "https://*.applicationstudio.cloud.sap/**"
     ]
-  }
+  },
+  "attributes": [],
+  "authorities-inheritance": false
 }
