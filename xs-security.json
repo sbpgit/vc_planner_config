@@ -1,5 +1,5 @@
 {
-  "xsappname": "dependency_probab_rule",
+  "xsappname": "dependency-probab-rule",
   "tenant-mode": "dedicated",
   "description": "Security profile of called application",
  "scopes": [

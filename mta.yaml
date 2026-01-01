@@ -5,21 +5,17 @@ version: 1.0.0
 modules:
 - name: Dependency_Probab_Rule-srv
   type: nodejs
-  path: gen/srv
+  path: srv
   provides:
   - name: srv-api
     properties:
       srv-url: ${default-url}
   parameters:
-    buildpack: nodejs_buildpack
     disk-quota: 512MB
     instances: 1
     memory: 512MB
   build-parameters:
-    builder: npm-ci
-    ignore:
-    - env
-    - ./node_modules
+    builder: npm
 - name: Dependency_Probab_Rule-app
   type: com.sap.application.content
   path: app
@@ -89,9 +85,3 @@ resources:
     service-plan: application
 parameters:
   enable-parallel-deployments: true
-build-parameters:
-  before-all:
-  - builder: custom
-    commands:
-    - npm ci
-    - npm run build
