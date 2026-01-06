@@ -1,0 +1,32 @@
+{
+  "_version": "1.32.0",
+  "sap.app": {
+    "id": "dependency.probab.rule",
+    "type": "application",
+    "title": "Dependency Probab Rule",
+    "description": "Dependency Probability Rule Application",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "display": {
+          "semanticObject": "DependencyProbabRule",
+          "action": "display",
+          "title": "Dependency Probab Rule",
+          "subTitle": "Dependency Probability Rule Application",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    }
+  },
+  "sap.cloud": {
+    "service": "Dependency_Probab_Rule"
+  },
+  "sap.ui": {
+    "technology": "HTML"
+  }
+}

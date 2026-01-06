@@ -1,87 +1,107 @@
 _schema-version: 3.3.0
 ID: Dependency_Probab_Rule
-description: A simple CAP project.
 version: 1.0.0
+description: A simple CAP project.
+
 modules:
+# =========================
+# CAP BACKEND
+# =========================
 - name: Dependency_Probab_Rule-srv
   type: nodejs
-  path: srv
+  path: gen/srv
   provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
+    - name: srv-api
+      properties:
+        srv-url: ${default-url}
   parameters:
+    memory: 512MB
     disk-quota: 512MB
     instances: 1
-    memory: 512MB
   build-parameters:
     builder: npm
+
+# =========================
+# HTML5 CONTENT (REACT BUILD)
+# =========================
 - name: Dependency_Probab_Rule-app
   type: com.sap.application.content
-  path: app
-  build-parameters:
-    build-result: build
+  path: .
   requires:
     - name: Dependency_Probab_Rule_html_repo_host
+      parameters:
+        content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+      - name: Dependency_Probab_Rule-ui-content
+        artifacts:
+          - Dependency_Probab_Rule.zip
+        target-path: resources/
+- name: Dependency_Probab_Rule-ui-content
+  type: html5
+  path: app
+  build-parameters:
+    builder: custom
+    commands:
+      - npm install
+      - npm run build
+      - sh -c "cp html5-manifest.json build/manifest.json"
+      - sh -c "cp xs-app.json build/xs-app.json"
+      - sh -c "cd build && zip -r ../Dependency_Probab_Rule.zip ."
+    build-result: .
+
+
+# =========================
+# DESTINATION CONTENT
+# =========================
 - name: Dependency_Probab_Rule-destination-content
   type: com.sap.application.content
   requires:
-  - name: Dependency_Probab_Rule-destination-service
-    parameters:
-      content-target: true
-  - name: Dependency_Probab_Rule_html_repo_host
-    parameters:
-      service-key:
-        name: Dependency_Probab_Rule_html_repo_host-key
-  - name: uaa_Dependency_Probab_Rule
-    parameters:
-      service-key:
-        name: uaa_Dependency_Probab_Rule-key
+    - name: Dependency_Probab_Rule-destination-service
+      parameters:
+        content-target: true
+    - name: Dependency_Probab_Rule_html_repo_host
+      parameters:
+        service-key:
+          name: Dependency_Probab_Rule_html_repo_host-key
+    - name: uaa_Dependency_Probab_Rule
+      parameters:
+        service-key:
+          name: uaa_Dependency_Probab_Rule-key
   parameters:
     content:
       instance:
         destinations:
-        - Name: approutermanaged_Dependency_Probab_Rule_html_repo_host
-          ServiceInstanceName: Dependency_Probab_Rule_html_repo_host
-          ServiceKeyName: Dependency_Probab_Rule_html_repo_host-key
-          sap.cloud.service: approutermanaged
-        - Authentication: OAuth2UserTokenExchange
-          Name: approutermanaged_uaa_Dependency_Probab_Rule
-          ServiceInstanceName: Dependency_Probab_Rule-xsuaa-service
-          ServiceKeyName: uaa_Dependency_Probab_Rule-key
-          sap.cloud.service: approutermanaged
+          - Name: Dependency_Probab_Rule_html_repo_host
+            ServiceInstanceName: Dependency_Probab_Rule_html_repo_host
+            ServiceKeyName: Dependency_Probab_Rule_html_repo_host-key
+            sap.cloud.service: Dependency_Probab_Rule
         existing_destinations_policy: ignore
   build-parameters:
     no-source: true
+
 resources:
 - name: Dependency_Probab_Rule_html_repo_host
   type: org.cloudfoundry.managed-service
   parameters:
     service: html5-apps-repo
     service-plan: app-host
+
 - name: Dependency_Probab_Rule-destination-service
   type: org.cloudfoundry.managed-service
   parameters:
-    config:
-      HTML5Runtime_enabled: true
-      init_data:
-        instance:
-          destinations:
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
-      version: 1.0.0
     service: destination
-    service-name: Dependency_Probab_Rule-destination-service
     service-plan: lite
+    service-name: Dependency_Probab_Rule-destination-service
+
 - name: uaa_Dependency_Probab_Rule
   type: org.cloudfoundry.managed-service
   parameters:
     path: ./xs-security.json
     service: xsuaa
-    service-name: Dependency_Probab_Rule-xsuaa-service
     service-plan: application
+    service-name: Dependency_Probab_Rule-xsuaa-service
+
 parameters:
   enable-parallel-deployments: true
