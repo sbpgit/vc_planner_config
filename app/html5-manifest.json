@@ -1,7 +1,7 @@
 {
   "_version": "1.32.0",
   "sap.app": {
-    "id": "dependency.probab.rule",
+    "id": "Dependency_Probab_Rule",
     "type": "application",
     "title": "Dependency Probab Rule",
     "description": "Dependency Probability Rule Application",
@@ -23,10 +23,13 @@
       }
     }
   },
+   "sap.ui": {
+    "technology": "HTML"
+  },
+  "sap.platform.runtime": {
+    "componentType": "html"
+  },
   "sap.cloud": {
     "service": "Dependency_Probab_Rule"
-  },
-  "sap.ui": {
-    "technology": "HTML"
-  }
+  } 
 }

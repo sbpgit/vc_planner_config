@@ -23,10 +23,13 @@
       }
     }
   },
+   "sap.ui": {
+    "technology": "HTML"
+  },
+  "sap.platform.runtime": {
+    "componentType": "html"
+  },
   "sap.cloud": {
     "service": "Dependency_Probab_Rule"
-  },
-  "sap.ui": {
-    "technology": "HTML"
-  }
+  } 
 }
