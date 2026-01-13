@@ -1,7 +1,7 @@
 {
   "_version": "1.32.0",
   "sap.app": {
-    "id": "dependency.probab.rule",
+    "id": "Dependency_Probab_Rule",
     "type": "application",
     "title": "Dependency Probab Rule",
     "description": "Dependency Probability Rule Application",
